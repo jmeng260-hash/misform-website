@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --color-bg-light: #f2f2f2;
+}
+
+@keyframes grainMove {
+  0% { transform: translate(0,0); }
+  10% { transform: translate(-5%, -8%); }
+  20% { transform: translate(-12%, 5%); }
+  30% { transform: translate(7%, -10%); }
+  40% { transform: translate(-5%, 15%); }
+  50% { transform: translate(-12%, 7%); }
+  60% { transform: translate(10%, 0); }
+  70% { transform: translate(0, 10%); }
+  80% { transform: translate(8%, 2%); }
+  90% { transform: translate(-10%, 10%); }
+  100% { transform: translate(0,0); }
+}
+
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 100;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.28'/%3E%3C/svg%3E");
+  opacity: 0.11;
+  animation: grainMove 8s steps(10) infinite;
+  transition: background-image 0.5s ease;
+}
+
+.grain-collection {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.22'/%3E%3C/svg%3E");
+}
+
+@keyframes floatWord {
+  0% {
+    translate: 0 0;
+    letter-spacing: -0.13em;
+  }
+  50% {
+    translate: 2vw -1.6vh;
+    letter-spacing: -0.1em;
+  }
+  100% {
+    translate: -1vw 2vh;
+    letter-spacing: -0.15em;
+  }
+}
+
+.glass-word-animation {
+  animation: floatWord 12s ease-in-out infinite alternate;
+}
+
+.inversion-brush {
+  mix-blend-mode: difference;
+  pointer-events: none;
+  background: white;
+  filter: blur(40px);
+}
+
+.skew-grid-item {
+  transform: skewY(-2deg);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skew-grid-item:hover {
+  transform: skewY(0deg) scale(1.02);
+}
