@@ -238,8 +238,6 @@ export default function App() {
   const [activeResearchTab, setActiveResearchTab] = useState<number>(0);
   const [activeConceptTab, setActiveConceptTab] = useState<number>(0);
 
-  const springX = useSpring(mouseX, { stiffness: 100, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 100, damping: 30 });
   const springRelX = useSpring(relX, { stiffness: 100, damping: 30 });
   const springRelY = useSpring(relY, { stiffness: 100, damping: 30 });
 
@@ -247,8 +245,19 @@ export default function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const cursorRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    let rafId: number;
+    let tx = window.innerWidth / 2;
+    let ty = window.innerHeight / 2;
+    let cx = tx;
+    let cy = ty;
+
     const handleMouseMove = (e: MouseEvent) => {
+      tx = e.clientX;
+      ty = e.clientY;
+      
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
 
@@ -258,8 +267,24 @@ export default function App() {
         relY.set(e.clientY - rect.top);
       }
     };
+
+    const update = () => {
+      cx += (tx - cx) * 0.25;
+      cy += (ty - cy) * 0.25;
+      
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      }
+      rafId = requestAnimationFrame(update);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    update();
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
   }, [mouseX, mouseY]);
 
   return (
@@ -268,19 +293,17 @@ export default function App() {
       <div className={`grain transition-opacity duration-1000 ${view === 'collection' ? 'grain-collection' : ''}`} />
 
       {/* Inversion Brush */}
-      <motion.div 
-        className="inversion-brush fixed rounded-full z-[90]"
-        animate={{ 
-          width: view === 'collection' ? 60 : 300,
-          height: view === 'collection' ? 60 : 300,
-          filter: view === 'collection' ? 'blur(12px)' : 'blur(40px)'
-        }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      <div 
+        ref={cursorRef}
+        className="inversion-brush fixed rounded-full z-[90] pointer-events-none"
         style={{ 
-          x: springX, 
-          y: springY,
-          translateX: "-50%",
-          translateY: "-50%"
+          width: view === 'collection' ? 60 : 80,
+          height: view === 'collection' ? 60 : 80,
+          filter: view === 'collection' ? 'blur(12px)' : 'blur(16px)',
+          transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1), height 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+          willChange: 'transform',
+          top: 0,
+          left: 0,
         }}
       />
 
