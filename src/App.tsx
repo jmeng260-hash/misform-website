@@ -545,19 +545,8 @@ export default function App() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const cursorRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    let rafId: number;
-    let tx = window.innerWidth / 2;
-    let ty = window.innerHeight / 2;
-    let cx = tx;
-    let cy = ty;
-
     const handleMouseMove = (e: MouseEvent) => {
-      tx = e.clientX;
-      ty = e.clientY;
-
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
 
@@ -568,22 +557,10 @@ export default function App() {
       }
     };
 
-    const update = () => {
-      cx += (tx - cx) * 0.25;
-      cy += (ty - cy) * 0.25;
-
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
-      }
-      rafId = requestAnimationFrame(update);
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    update();
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(rafId);
     };
   }, [mouseX, mouseY]);
 
@@ -592,23 +569,6 @@ export default function App() {
       {/* Background Noise/Grain */}
       <div
         className={`grain transition-opacity duration-1000 ${view === "collection" ? "grain-collection" : ""}`}
-      />
-
-      {/* Inversion Brush */}
-      <div
-        ref={cursorRef}
-        className="inversion-brush fixed rounded-full z-[90] pointer-events-none"
-        style={{
-          width: view === "collection" ? 80 : 120,
-          height: view === "collection" ? 80 : 120,
-          backgroundImage:
-            "radial-gradient(circle at center, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 20%, rgba(255,255,255,0) 65%)",
-          transition:
-            "width 0.8s cubic-bezier(0.16, 1, 0.3, 1), height 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
-          willChange: "transform",
-          top: 0,
-          left: 0,
-        }}
       />
 
       {/* Navigation */}
